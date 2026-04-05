@@ -12,8 +12,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
       - name: Build with Buildozer Action
-        uses: ArtemShatalov/buildozer-action@v1.6.1 # أحدث نسخة مستقرة ومجربة
+        uses: ArtemShatalov/buildozer-action@v1.6.1
         with:
           command: buildozer android debug
           buildozer_version: master
