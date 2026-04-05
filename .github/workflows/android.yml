@@ -5,12 +5,14 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+# إجبار GitHub Actions على استخدام أحدث نسخة من Node.js في 2026
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # النسخة الأكثر استقراراً لبناء الأندرويد
+    # استخدام نسخة Ubuntu الأكثر استقراراً لبناء Kivy
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4
@@ -41,17 +43,15 @@ jobs:
 
     - name: Build with Buildozer
       run: |
-        # استخدام أمر البناء مع قبول كل التراخيص تلقائياً
-        yes | buildozer -v android debug
+        # بناء هادئ ومستقر مع قبول التراخيص تلقائياً
+        yes | buildozer android debug
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
         BUILDOZER_ALLOW_ORG_TEST_DOMAIN: "1"
 
     - name: Upload Artifact
-      if: always() # ارفع الملفات حتى لو فشل عشان نشوف الأخطاء
+      if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: Noser_App_Build_Package
-        path: |
-          bin/*.apk
-          .buildozer/android/platform/build-*/build/logs/*.log
+        name: Noser_App_Final_APK
+        path: bin/*.apk
