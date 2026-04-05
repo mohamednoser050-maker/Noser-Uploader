@@ -7,7 +7,6 @@ on:
 
 jobs:
   build:
-    # استخدام Ubuntu 22.04 لضمان التوافق التام
     runs-on: ubuntu-22.04
 
     steps:
@@ -21,52 +20,30 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y \
-            build-essential \
-            git \
-            python3-dev \
-            ffmpeg \
-            libsdl2-dev \
-            libsdl2-image-dev \
-            libsdl2-mixer-dev \
-            libsdl2-ttf-dev \
-            libportmidi-dev \
-            libswscale-dev \
-            libavformat-dev \
-            libavcodec-dev \
-            zlib1g-dev \
-            libgstreamer1.0-dev \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good \
-            libsqlite3-dev \
-            sqlite3 \
-            bzip2 \
-            libbz2-dev \
-            libssl-dev \
-            openssl \
-            libgdbm-dev \
-            libncursesw5-dev \
-            libreadline-dev \
-            uuid-dev \
-            tk-dev \
-            libffi-dev \
-            liblzma-dev \
-            libtool \
-            pkg-config \
-            autoconf \
-            automake \
-            libltdl-dev
+        # حل مشكلة الاعتمادات المكسورة (Broken Packages)
+        sudo apt-get install -y --fix-broken
+        # تثبيت المكتبة اللي كانت مسببة المشكلة يدوياً أولاً
+        sudo apt-get install -y libunwind-dev
         
-        # تثبيت النسخ المستقرة من الأدوات
+        # تثبيت باقي المكتبات مع تجاهل الأخطاء البسيطة
+        sudo apt-get install -y \
+            build-essential git python3-dev ffmpeg libsdl2-dev \
+            libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+            libportmidi-dev libswscale-dev libavformat-dev \
+            libavcodec-dev zlib1g-dev libgstreamer1.0-dev \
+            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
+            libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev \
+            openssl libgdbm-dev libncursesw5-dev libreadline-dev \
+            uuid-dev tk-dev libffi-dev liblzma-dev libtool \
+            pkg-config autoconf automake libltdl-dev
+        
         pip install --upgrade pip
         pip install --upgrade buildozer cython==0.29.33 sh
 
     - name: Build with Buildozer
       run: |
-        # بناء التطبيق مع قبول التراخيص أوتوماتيكياً
         buildozer android debug
       env:
-        # إجبار البناء على عدم التوقف لطلب مدخلات
         APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
         BUILDOZER_ALLOW_ORG_TEST_DOMAIN: "1"
 
