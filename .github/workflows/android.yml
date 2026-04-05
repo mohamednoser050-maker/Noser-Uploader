@@ -5,9 +5,12 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04 # النسخة الأكثر استقراراً لبناء الأندرويد
 
     steps:
     - uses: actions/checkout@v4
@@ -20,12 +23,8 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        # حل مشكلة الاعتمادات المكسورة (Broken Packages)
         sudo apt-get install -y --fix-broken
-        # تثبيت المكتبة اللي كانت مسببة المشكلة يدوياً أولاً
-        sudo apt-get install -y libunwind-dev
-        
-        # تثبيت باقي المكتبات مع تجاهل الأخطاء البسيطة
+        sudo apt-get install -y libunwind-dev libltdl-dev
         sudo apt-get install -y \
             build-essential git python3-dev ffmpeg libsdl2-dev \
             libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
@@ -35,20 +34,24 @@ jobs:
             libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev \
             openssl libgdbm-dev libncursesw5-dev libreadline-dev \
             uuid-dev tk-dev libffi-dev liblzma-dev libtool \
-            pkg-config autoconf automake libltdl-dev
+            pkg-config autoconf automake
         
         pip install --upgrade pip
         pip install --upgrade buildozer cython==0.29.33 sh
 
     - name: Build with Buildozer
       run: |
-        buildozer android debug
+        # استخدام أمر البناء مع قبول كل التراخيص تلقائياً
+        yes | buildozer -v android debug
       env:
         APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
         BUILDOZER_ALLOW_ORG_TEST_DOMAIN: "1"
 
     - name: Upload Artifact
+      if: always() # ارفع الملفات حتى لو فشل عشان نشوف الأخطاء
       uses: actions/upload-artifact@v4
       with:
-        name: Noser_App_Final
-        path: bin/*.apk
+        name: Noser_App_Build_Package
+        path: |
+          bin/*.apk
+          .buildozer/android/platform/build-*/build/logs/*.log
