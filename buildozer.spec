@@ -19,7 +19,7 @@ source.include_exts = py,png,jpg,kv,atlas,json
 version = 1.0.0
 
 # (list) Application requirements
-requirements = python3, kivy==2.3.0, kivymd==1.1.1, python-telegram-bot, httpx, android, pyjnius, certifi, openssl, anyio, httpcore, h11, sniffio, idna, typing-extensions
+requirements = python3, kivy==2.3.0, kivymd==1.1.1, python-telegram-bot, httpx, android, pyjnius, certifi, openssl
 
 # (list) Permissions
 android.permissions = INTERNET, READ_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, FOREGROUND_SERVICE, POST_NOTIFICATIONS, REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
