@@ -5,53 +5,22 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# إجبار GitHub Actions على استخدام أحدث نسخة من Node.js في 2026
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   build:
-    # استخدام نسخة Ubuntu الأكثر استقراراً لبناء Kivy
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest # هنرجع للأحدث ونستخدم الأداة الرسمية
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - name: Build with Buildozer Action
+        uses: ArtemShatalov/buildozer-action@v1.6.1 # أحدث نسخة مستقرة ومجربة
+        with:
+          command: buildozer android debug
+          buildozer_version: master
+          python_version: 3.11
 
-    - name: Install dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y --fix-broken
-        sudo apt-get install -y libunwind-dev libltdl-dev
-        sudo apt-get install -y \
-            build-essential git python3-dev ffmpeg libsdl2-dev \
-            libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
-            libportmidi-dev libswscale-dev libavformat-dev \
-            libavcodec-dev zlib1g-dev libgstreamer1.0-dev \
-            gstreamer1.0-plugins-base gstreamer1.0-plugins-good \
-            libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev \
-            openssl libgdbm-dev libncursesw5-dev libreadline-dev \
-            uuid-dev tk-dev libffi-dev liblzma-dev libtool \
-            pkg-config autoconf automake
-        
-        pip install --upgrade pip
-        pip install --upgrade buildozer cython==0.29.33 sh
-
-    - name: Build with Buildozer
-      run: |
-        # بناء هادئ ومستقر مع قبول التراخيص تلقائياً
-        yes | buildozer android debug
-      env:
-        APP_ANDROID_ACCEPT_SDK_LICENSE: "1"
-        BUILDOZER_ALLOW_ORG_TEST_DOMAIN: "1"
-
-    - name: Upload Artifact
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: Noser_App_Final_APK
-        path: bin/*.apk
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Noser_App_Final
+          path: bin/*.apk
