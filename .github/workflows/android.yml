@@ -10,28 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
-    - name: Get Date
-      id: get-date
-      run: |
-        echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: Cache Buildozer
-      uses: actions/cache@v3
+    - name: Set up Python
+      uses: actions/setup-python@v5
       with:
-        path: .buildozer
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential git python3 python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev openssl libgdbm-dev libncursesw5-dev libreadline-dev uuid-dev tk-dev libffi-dev liblzma-dev libtool pkg-config autoconf automake
+        pip install --upgrade buildozer cython==0.29.33
 
     - name: Build with Buildozer
-      uses: ArtemShatalov/buildozer-action@v1
-      with:
-        command: buildozer android debug
-        buildozer_version: master
+      run: |
+        yes | buildozer -v android debug
+      shell: bash
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
-        name: Noser_Image_Uploader_${{ steps.get-date.outputs.date }}
+        name: Noser_App_APK
         path: bin/*.apk
